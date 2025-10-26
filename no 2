@@ -1,0 +1,97 @@
+/**
+ * Soal 2: Pemeriksaan Skak Raja oleh Benteng
+ */
+
+// Data Input berdasarkan soal
+const board = [
+    [".", ".", ".", ".", ".", ".", ".", "."],
+    [".", ".", ".", ".", ".", ".", ".", "."],
+    [".", ".", ".", ".", ".", ".", ".", "."],
+    [".", ".", ".", "R", ".", ".", ".", "."],
+    [".", ".", ".", ".", ".", ".", ".", "."],
+    [".", ".", ".", ".", "K", ".", ".", "."],
+    [".", ".", ".", ".", ".", ".", ".", "."],
+    [".", ".", ".", ".", ".", ".", ".", "."]
+];
+
+// --- Fungsi Utama Pengecekan SKAK ---
+function isKingInCheck(chessBoard) {
+    let kingPos = null;
+    let rookPos = null;
+
+    // 1. Cari posisi Raja ('K') dan Benteng ('R')
+    // Asumsi: Hanya ada satu 'K' dan satu 'R'
+    for (let r = 0; r < chessBoard.length; r++) {
+        for (let c = 0; c < chessBoard[r].length; c++) {
+            if (chessBoard[r][c] === 'K') {
+                kingPos = { row: r, col: c };
+            } else if (chessBoard[r][c] === 'R') {
+                rookPos = { row: r, col: c };
+            }
+        }
+    }
+
+    // Jika tidak ditemukan K atau R, keluar
+    if (!kingPos || !rookPos) {
+        return "Aman (Posisi tidak lengkap)";
+    }
+
+    // 2. Cek apakah Raja dan Benteng berada di baris atau kolom yang sama
+    const sameRow = kingPos.row === rookPos.row;
+    const sameCol = kingPos.col === rookPos.col;
+
+    // Jika tidak sebaris atau sekolom, Benteng tidak bisa menyerang [cite: 78, 98]
+    if (!sameRow && !sameCol) {
+        return "Aman";
+    }
+
+    // 3. Cek Jalur (Horizontal atau Vertikal)
+    let isPathBlocked = false;
+
+    if (sameRow) {
+        // Pergerakan Horizontal
+        const start = Math.min(kingPos.col, rookPos.col) + 1; // Mulai dari petak setelah salah satu
+        const end = Math.max(kingPos.col, rookPos.col); // Berakhir tepat sebelum yang lain
+        
+        for (let c = start; c < end; c++) {
+            if (chessBoard[kingPos.row][c] !== '.') {
+                // Ada halangan (petak bukan kosong) [cite: 78]
+                isPathBlocked = true;
+                break;
+            }
+        }
+    } else if (sameCol) {
+        // Pergerakan Vertikal
+        const start = Math.min(kingPos.row, rookPos.row) + 1; // Mulai dari petak setelah salah satu
+        const end = Math.max(kingPos.row, rookPos.row); // Berakhir tepat sebelum yang lain
+        
+        for (let r = start; r < end; r++) {
+            if (chessBoard[r][kingPos.col] !== '.') {
+                // Ada halangan (petak bukan kosong) [cite: 78]
+                isPathBlocked = true;
+                break;
+            }
+        }
+    }
+
+    // 4. Tentukan hasil
+    if (isPathBlocked) {
+        return "Aman";
+    } else {
+        // Jalur langsung, Benteng mengancam Raja [cite: 79]
+        return "SKAK!";
+    }
+}
+
+// Jalankan program dengan input yang diberikan
+const result = isKingInCheck(board);
+console.log("\n--- Hasil Pengecekan SKAK ---");
+console.log(result);
+
+// --- Penjelasan Berdasarkan Contoh ---
+/*
+* Benteng ('R') ada di (3, 3) (Baris 4, Kolom 4).
+* Raja ('K') ada di (5, 4) (Baris 6, Kolom 5). [cite: 97]
+* Mereka tidak sebaris (3 != 5) dan tidak sekolom (3 != 4). [cite: 98]
+* Hasil: Aman. [cite: 96]
+*/
